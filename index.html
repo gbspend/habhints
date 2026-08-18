@@ -17,12 +17,15 @@
             font-family: Georgia, serif;
             background: #f4f0df;
             color: #3d4933;
-        }
+			display: flex;
+			flex-direction: column;
+		}
 
         .page {
             max-width: 850px;
             margin: 0 auto;
             padding: 45px 25px;
+			flex: 1;
         }
 
         h1 {
@@ -222,6 +225,65 @@
 			font-style: italic;
 			text-align: center;
 		}
+		
+		.random-hint-area {
+			margin: 0 auto 25px;
+			text-align: center;
+		}
+
+		#randomHint {
+			margin-bottom: 15px;
+		}
+
+		#randomHintButton {
+			padding: 13px 35px;
+			border: none;
+			border-radius: 10px;
+			background: #72966D;
+			color: white;
+			font-family: inherit;
+			font-size: 19px;
+			cursor: pointer;
+			box-shadow: 0 3px 6px rgba(60, 60, 40, 0.15);
+		}
+
+		#randomHintButton:hover {
+			background: #627f5e;
+		}
+
+		#randomHintButton:active {
+			transform: translateY(1px);
+		}
+		
+		.divider {
+			height: 1px;
+			margin: 28px 0;
+			background: linear-gradient(
+				to right,
+				transparent,
+				#c8c8a8 20%,
+				#c8c8a8 80%,
+				transparent
+			);
+		}
+		
+		.search-intro {
+			text-align: center;
+			margin: 0 0 18px;
+		}
+
+		.search-intro h2 {
+			margin: 0 0 5px;
+			font-size: 26px;
+			color: #526b42;
+		}
+
+		.search-intro p {
+			margin: 0;
+			font-size: 15px;
+			color: #85846d;
+			font-style: italic;
+		}
     </style>
 </head>
 
@@ -231,10 +293,25 @@
 
     <h1>
 		<span class="blue">P</span><span class="orange">o</span><span class="purple">k</span><span class="red">o</span><span class="green">p</span><span class="purple">i</span><span class="orange">a</span>
-		Habitat Hints
+		Habitat&nbsp;Hints
 	</h1>
 	<p class="subtitle">More fun than just looking them up!</p>
 	
+	<div class="random-hint-area">
+
+		<div id="randomHint"></div>
+
+		<button id="randomHintButton">
+			Random Habitat Description
+		</button>
+
+	</div>
+	
+	<div class="divider"></div>
+	<div class="search-intro">
+		<h2>Hints by Element</h2>
+		<p>Choose items or environment features for hints about habitats that include them.</p>
+	</div>
     <div class="search-box">
 
         <div class="search-row">
@@ -262,10 +339,6 @@
             </div>
 
         </div>
-
-		<div class="input-note">
-			If an element isn't in this list, it's not part of any habitat.
-		</div>
 
         <div class="options">
 
@@ -539,11 +612,7 @@ function updateResults() {
     if ((!input1 || !valid1) &&
         (!input2 || !valid2)) {
 
-        results.innerHTML =
-            `<div class="empty">
-                Choose an element to see its habitat hints.
-             </div>`;
-
+        results.innerHTML ="";
         return;
     }
 
@@ -621,6 +690,31 @@ document
     .getElementById("showDescriptions")
     .addEventListener("change", updateResults);
 
+document
+    .getElementById("randomHintButton")
+    .addEventListener("click", showRandomHint);
+
+function showRandomHint() {
+
+    if (habitats.length === 0) {
+        return;
+    }
+
+    const habitat =
+        habitats[Math.floor(Math.random() * habitats.length)];
+
+    document.getElementById("randomHint").innerHTML = `
+        <div class="habitat">
+            <h2 class="habitat-name">
+                ${escapeHtml(habitat.Habitat)}
+            </h2>
+
+            <p class="habitat-description">
+                ${escapeHtml(habitat.Description)}
+            </p>
+        </div>
+    `;
+}
 </script>
 
 </body>
