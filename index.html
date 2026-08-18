@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Habitat Hints</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Georgia, serif;
+            background: #f4f0df;
+            color: #3d4933;
+        }
+
+        .page {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 45px 25px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 8px;
+            font-size: 42px;
+            color: #526b42;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin: 0 0 35px;
+            color: #77765f;
+            font-style: italic;
+        }
+
+        .search-box {
+            background: #fffdf4;
+            border: 2px solid #c8c8a8;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(60, 60, 40, 0.08);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #6d7258;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #c8c8a8;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 17px;
+            background: white;
+            color: #3d4933;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #829765;
+        }
+
+        input.invalid {
+            border-color: #c87b70;
+        }
+
+        .suggestions {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            z-index: 10;
+
+            background: white;
+            border: 1px solid #c8c8a8;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,.12);
+
+            max-height: 220px;
+            overflow-y: auto;
+
+            display: none;
+        }
+
+        .suggestion {
+            padding: 9px 13px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .suggestion:hover,
+        .suggestion.selected {
+            background: #e8edd9;
+        }
+
+        .options {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #d8d7bf;
+        }
+
+        .options-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .checkbox {
+            margin-right: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox input {
+            width: auto;
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+
+        .result-summary {
+            text-align: center;
+            font-size: 19px;
+            margin-bottom: 18px;
+        }
+
+        .result-count {
+            font-size: 30px;
+            font-weight: bold;
+            color: #526b42;
+        }
+
+        .habitat {
+            background: #fffdf4;
+            border: 1px solid #d1d0b8;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 6px rgba(60, 60, 40, 0.06);
+        }
+
+        .habitat-name {
+            margin: 0 0 7px;
+            font-size: 21px;
+            color: #526b42;
+        }
+
+        .habitat-description {
+            margin: 0;
+            line-height: 1.5;
+            color: #666652;
+        }
+
+        .empty {
+            text-align: center;
+            color: #85846d;
+            font-style: italic;
+            padding: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 34px;
+            }
+
+            .search-row {
+                display: block;
+            }
+
+            .search-row .input-wrapper + .input-wrapper {
+                margin-top: 15px;
+            }
+        }
+		
+		h1 {
+			text-align: center;
+			margin: 0 0 8px;
+			font-size: 42px;
+			color: #526b42;
+		}
+
+		h1 .blue   { color: #5B8FA8; }
+		h1 .orange { color: #D99A5B; }
+		h1 .purple { color: #9279A8; }
+		h1 .red    { color: #C87575; }
+		h1 .green  { color: #72966D; }
+		
+		.input-note {
+			margin: 4px 2px 18px;
+			font-size: 14px;
+			color: #85846d;
+			font-style: italic;
+			text-align: center;
+		}
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <h1>
+		<span class="blue">P</span><span class="orange">o</span><span class="purple">k</span><span class="red">o</span><span class="green">p</span><span class="purple">i</span><span class="orange">a</span>
+		Habitat Hints
+	</h1>
+	<p class="subtitle">More fun than just looking them up!</p>
+	
+    <div class="search-box">
+
+        <div class="search-row">
+
+            <div class="input-wrapper">
+                <label for="item1">Element 1</label>
+                <input
+                    id="item1"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Start typing an element..."
+                >
+                <div class="suggestions" id="suggestions1"></div>
+            </div>
+
+            <div class="input-wrapper">
+                <label for="item2">Element 2</label>
+                <input
+                    id="item2"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Another element (optional)"
+                >
+                <div class="suggestions" id="suggestions2"></div>
+            </div>
+
+        </div>
+
+		<div class="input-note">
+			If an element isn't in this list, it's not part of any habitat.
+		</div>
+
+        <div class="options">
+
+            <div class="options-title">
+                Display:
+            </div>
+
+            <label class="checkbox">
+                <input type="checkbox" id="showNames">
+                Habitat names
+            </label>
+
+            <label class="checkbox">
+                <input type="checkbox" id="showDescriptions">
+                Descriptions
+            </label>
+
+        </div>
+
+    </div>
+
+    <div id="results"></div>
+
+</div>
+
+<footer style="text-align: center; font-size: 0.85rem; color: #777; padding: 1rem;">
+    <p>This is an unofficial fan site for non-profit entertainment purposes only | &copy; 2026 Brad S.</p>
+    <a href="https://paypal.me/gbspend" target="_blank" rel="noopener noreferrer">
+        Support this site
+    </a>
+</footer>
+
+<script>
+
+let habitats = [];
+let items = [];
+
+Promise.all([
+    fetch("data.json").then(response => response.json()),
+    fetch("items.json").then(response => response.json())
+])
+.then(([habitatData, itemData]) => {
+
+    habitats = habitatData;
+    items = itemData;
+
+    setupAutocomplete("item1", "suggestions1");
+    setupAutocomplete("item2", "suggestions2");
+
+    updateResults();
+})
+.catch(error => {
+    console.error(error);
+
+    document.getElementById("results").innerHTML =
+        `<div class="empty">Could not load the habitat data.</div>`;
+});
+
+function normalizeItem(text) {
+
+    return text
+        .replace(/\s+x\s*\d+\s*$/i, "")
+        .trim()
+        .toLowerCase();
+}
+
+function setupAutocomplete(inputId, suggestionsId) {
+
+    const input = document.getElementById(inputId);
+    const suggestions = document.getElementById(suggestionsId);
+
+    let selectedIndex = -1;
+
+    function showSuggestions() {
+
+        const text = input.value.trim().toLowerCase();
+
+        if (!text) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        const matches = items
+            .filter(item =>
+                item.toLowerCase().includes(text)
+            )
+            .slice(0, 12);
+
+        suggestions.innerHTML = "";
+        selectedIndex = -1;
+
+        if (matches.length === 0) {
+            suggestions.style.display = "none";
+            return;
+        }
+
+        for (const item of matches) {
+
+            const div = document.createElement("div");
+            div.className = "suggestion";
+            div.textContent = item;
+
+            div.addEventListener("mousedown", event => {
+                event.preventDefault();
+
+                input.value = item;
+                suggestions.style.display = "none";
+
+                input.classList.remove("invalid");
+
+                updateResults();
+            });
+
+            suggestions.appendChild(div);
+        }
+
+        suggestions.style.display = "block";
+    }
+
+
+    input.addEventListener("input", () => {
+
+        input.classList.remove("invalid");
+
+        showSuggestions();
+        updateResults();
+    });
+
+
+    input.addEventListener("focus", showSuggestions);
+
+
+    input.addEventListener("blur", () => {
+
+        setTimeout(() => {
+
+            suggestions.style.display = "none";
+
+            validateInput(input);
+
+        }, 150);
+    });
+
+
+    input.addEventListener("keydown", event => {
+
+        const choices =
+            suggestions.querySelectorAll(".suggestion");
+
+        if (!choices.length) {
+            return;
+        }
+
+        if (event.key === "ArrowDown") {
+
+            event.preventDefault();
+
+            selectedIndex =
+                Math.min(selectedIndex + 1, choices.length - 1);
+
+            updateSelectedChoice(choices);
+
+        }
+        else if (event.key === "ArrowUp") {
+
+            event.preventDefault();
+
+            selectedIndex =
+                Math.max(selectedIndex - 1, 0);
+
+            updateSelectedChoice(choices);
+
+        }
+        else if (event.key === "Enter") {
+
+            if (selectedIndex >= 0) {
+
+                event.preventDefault();
+
+                input.value =
+                    choices[selectedIndex].textContent;
+
+                suggestions.style.display = "none";
+
+                input.classList.remove("invalid");
+
+                updateResults();
+            }
+        }
+        else if (event.key === "Escape") {
+
+            suggestions.style.display = "none";
+        }
+    });
+
+
+    function updateSelectedChoice(choices) {
+
+        choices.forEach((choice, index) => {
+            choice.classList.toggle(
+                "selected",
+                index === selectedIndex
+            );
+        });
+    }
+}
+
+function validateInput(input) {
+
+    if (!input.value.trim()) {
+        input.classList.remove("invalid");
+        return;
+    }
+
+    const valid = items.some(
+        item => item.toLowerCase() === input.value.trim().toLowerCase()
+    );
+
+    input.classList.toggle("invalid", !valid);
+}
+
+function findMatchingHabitats(item1, item2) {
+
+    const normalized1 = normalizeItem(item1);
+    const normalized2 = normalizeItem(item2);
+
+    return habitats.filter(habitat => {
+
+        const requirements =
+            habitat.Requirements.map(normalizeItem);
+
+        const hasFirst =
+            !normalized1 ||
+            requirements.includes(normalized1);
+
+        const hasSecond =
+            !normalized2 ||
+            requirements.includes(normalized2);
+
+        return hasFirst && hasSecond;
+    });
+}
+
+function updateResults() {
+
+    const input1 =
+        document.getElementById("item1").value.trim();
+
+    const input2 =
+        document.getElementById("item2").value.trim();
+
+    const showNames =
+        document.getElementById("showNames").checked;
+
+    const showDescriptions =
+        document.getElementById("showDescriptions").checked;
+
+    const results =
+        document.getElementById("results");
+
+
+    const valid1 = items.some(
+        item => item.toLowerCase() === input1.toLowerCase()
+    );
+
+    const valid2 = items.some(
+        item => item.toLowerCase() === input2.toLowerCase()
+    );
+
+
+    if ((!input1 || !valid1) &&
+        (!input2 || !valid2)) {
+
+        results.innerHTML =
+            `<div class="empty">
+                Choose an element to see its habitat hints.
+             </div>`;
+
+        return;
+    }
+
+
+    const matching = findMatchingHabitats(
+        valid1 ? input1 : "",
+        valid2 ? input2 : ""
+    );
+
+
+    let html = `
+        <div class="result-summary">
+            <span class="result-count">${matching.length}</span>
+            habitat${matching.length === 1 ? "" : "s"} found
+        </div>
+    `;
+
+
+    if (matching.length === 0) {
+
+        html += `
+            <div class="empty">
+                No habitats contain both those elements.
+            </div>
+        `;
+
+    }
+    else {
+		if (!showNames && !showDescriptions) {
+			results.innerHTML = html;
+			return;
+		}
+
+        for (const habitat of matching) {
+
+            html += `<div class="habitat">`;
+
+            if (showNames) {
+                html += `
+                    <h2 class="habitat-name">
+                        ${escapeHtml(habitat.Habitat)}
+                    </h2>
+                `;
+            }
+
+            if (showDescriptions) {
+                html += `
+                    <p class="habitat-description">
+                        ${escapeHtml(habitat.Description)}
+                    </p>
+                `;
+            }
+
+            html += `</div>`;
+        }
+    }
+
+
+    results.innerHTML = html;
+}
+
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+document
+    .getElementById("showNames")
+    .addEventListener("change", updateResults);
+
+document
+    .getElementById("showDescriptions")
+    .addEventListener("change", updateResults);
+
+</script>
+
+</body>
+</html>
